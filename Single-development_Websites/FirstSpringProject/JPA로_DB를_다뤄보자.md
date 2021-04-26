@@ -1,0 +1,318 @@
+[이전으로](../Readme.md)
+# JPA로 DB를 다뤄보자
+#### JPA를 이용해 게시판 CRUD를 구현해 본다.
+
+---
+## SQL 매퍼 vs ORM(Object Relational Mapping)
+* SQL매퍼: 쿼리를 매핑, ```MyBatis``` 가 있다.
+* ORM: 객체를 매핑, ```JPA```가 있다.
+* JPA는 Java ORM 표준이다.
+
+---
+## 1. JPA
+* 웹 어플리케이션에서 객체를 관계형 데이터베이스에서 관리 하는것은 중요하다.
+* 결국 서비스의 중심이 DB가 되면서 프로젝트의 대부분이 SQL로 가득해졌다.
+* 개발자가 아무리 클래스를 아름 답게 설계해도, SQL을 통해야만 DB에 저장하고 조회할 수 있다.
+### 1.1 기존의 문제점
+* 수십, 수백 개의 테이블의 몇배의 SQL을 만들고 유지 보수 해야한다.
+* ```패러다임 불일치``` 문제가 있다.
+> #### 패러다임 불일치
+> 관계형 DB는 ```어떻게 데이터를 저장할지```에 초점이 맞춰진 기술이다.
+> 하지만, OOP는 메시지를 기반으로 ```기능과 속성을 한 곳에서 관리```하는 기술이다.
+> 즉, 관계형DB와 OOP 언어의 패러다임이 서로 다른데 객체를 DB에 저장하려 하니 문제가 발생 하는 것이다.
+
+* 다음 예시를 살펴보자.
+```java
+User user = findUser();
+Group group = uesr.getGroup();
+```
+* 위 코드는 누구나 명확하게 ```User```와 ```Group```이 부모-자식 관계임을 알 수 있다.
+* 하지만 DB가 추가 되면 다음과 같이 변경된다.
+```java
+User user = userDao.findUser();
+Group group = groupDao.findGroup(user.getGroupId());
+```
+* ```User``` 따로 ```Group``` 따로 조회하게 된다.
+* 상속, 1:N 등 다양한 객체 모델링을 DB로는 구현할 수 없기 때문에 DB 모델링에만 집중하게 된다.
+* ```JPA```는 이러한 문제점을 해결하기 위해 등장한다.
+### 1.2 JPA란?
+* 서로 지향하는 바가 다른 2개 영역(OOP언어와 RDB)을 중간에서 패러다임 일치를 시켜주기 위한 기술이다.
+* 즉, 개발자는 `객체지향적`으로 프로그래밍을 하고, JPA가 이를 DB에 맞게 SQL을 대신 생성해서 실행한다.
+* 따라서 더는 SQL에 종속적인 개발을 하지 않아도 된다. 결국 생산성이 향상되고 유지보수도 쉬워진다.
+
+### 1.3 Spring Data JPA
+* 인터페이스인 JPA를 사용하기 위해서는 구현체가 필요하다. 대표적으로 ```Hibernate```, ```EclipseLink```가 있다.
+* 하지만 Spring에서 JPA를 사용할 때는 이 구현체들을 직접 다루진 않는다.
+* 구현체들을 좀 더 쉽게 사용하고자 추상화 시킨 Spring Data JPA라는 모듈을 이용해 JPA 기술을 다룬다.
+> 관계: JPA <- Hibernate <- Spring Data JPA 
+* 한단계 더 감싸놓은 Spring Data JPA와 Hibernate를 쓰는 것 아이네느 큰 차이가 없지만, 그럼에도 사용 하는 이유는 크게 2가지 이다.
+> #### 구현체 교체의 용이성
+> * ```Hibernate```외에 ```다른 구현체로 쉽게 교체하기 위함```이다.
+> * Spring Data JPA 내부에서 구현체 매핑을 지원해주기 떄문이다.
+ 
+> #### 저장소 교체의 용이성
+> * RDB외에 다른 저장소로 쉽게 교체하기 위함이다.
+> * 만약 MongoDB로 교체가 필요하다면 개발자는 Spring Data JPA를 Spring Data MongoDB로 의존성만 교체하면 된다.
+> * Spring Data의 하위 프로젝트의 기본적인 CRUD 인터페이스가 같기 떄문에 가능한 일이다.
+
+---
+## 2. Spring Data JPA 적용하기
+### 2.1 의존성 추가
+```gradle
+    compile('org.springframework.boot:spring-boot-starter-data-jpa:')
+    compile('com.h2database:h2')
+```
+* 위와같이 build.gradle에 의존성을 추가한다.
+
+### 2.2 domain 패키지 추가
+* domain패키지를 추가한다.
+* 내부에 posts 패키지와 아래와 같이 ```Posts``` 클래스를 생성한다.
+```java
+@Getter
+@NoArgsConstructor
+@Entity // Table과 링크될 클래스이다. 카멜케이스 이름을 언더스코어 네이밍(스네이크 케이스)으로 매칭한다.
+public class Posts {
+
+    @Id // PK이다.
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // PK 생성규칙, Auto Increment가 적용된다.
+    private Long id;
+
+    // 디폴트 값외에 추가로 변경하고 싶은 옵션이 있을때 사용, 없어도 테이블의 컬럼이다.
+    // String의 columnDefinition의 디폴트 값은 VarChar(255)이다.
+    @Column(length = 500, nullable = false)
+    private String title;
+    
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String content;
+
+    //@Column이 없어도  클래스의 필드는 어트리 뷰트이다.
+    private String author;
+
+    @Builder
+    public Posts(String title, String content, String author){
+        this.title = title;
+        this.content = content;
+        this.author = author;
+    }
+}
+```
+* Entitiy 클래스 에서는 Setter 메서드를 만들지 않는다. 
+* 대신, 해당 필드의 값이 변경이 필요하면 명확이 그 목적과 의도를 나타낼 수 있는 메서드를 추가 해야한다.
+```java
+// 잘못된 예시
+public class Order(){
+    public void setStatus(boolean status){
+        this.status = status
+    }
+}
+public void 주문서비스의_취소이벤트(){
+    order.setStatus(false);
+}
+
+//올바른 예시
+public class Order(){
+    public void cancelOrder(){
+        this.status = false;
+    }
+}
+public void 주문서비스의_취소이벤트(){
+    order.cancelOrder();
+}
+```
+### 2.3 Repository 추가
+* 위에서 만든 Posts 클래스로 DB를 접근하게 해줄 JpaRepository를 생성한다.
+* Posts 클래스와 같은 패키지 내부에 아래와 같은 Repository 인터페이스를 추가한다.
+```java
+public interface PostsRepository extends JpaRepository<Posts, Long> {
+    
+}
+```
+* ```MyBatis```에서 Dao라 불리는 DB Layer 접근자이다.
+* 인터페이스 생성후 JpaRepository<Entity클래스, PK타입>을 상속하면 기본적인 CRUD 메소드가 자동으로 생성된다.
+
+---
+## 3. 테스트
+* 아래와 같은 테스트 코드를 작성한다.
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PostsRepositoryTest {
+
+    @Autowired
+    PostsRepository postsRepository;
+
+    @After
+    public void cleanup(){
+        postsRepository.deleteAll();
+    }
+
+    @Test
+    public void 게시글저장_불러오기(){
+        //given
+        String title = "테스트 게시글";
+        String content = " 테스트 본문";
+
+        // insert/update 쿼리가 실행된다.
+        // id 값이 있다면 update가, 없다면 insert쿼리가 실행된다.
+        postsRepository.save(Posts.builder().title(title).content(content).author("DevMinJ").build());
+        //when
+        List<Posts> postsList = postsRepository.findAll();
+        //then
+        Posts posts = postsList.get(0);
+        Assertions.assertThat(posts.getTitle()).isEqualTo(title);
+        Assertions.assertThat(posts.getContent()).isEqualTo(content);
+    }
+}
+```
+* 실제로 실행된 쿼리는 어떤 형태인지 보는법 
+* /src/main/resources에 application.properties 생성
+```
+spring.jpa.properties.hibernate.show_sql=true
+```
+* ```application.properties```에 위와 같이 추가하면 아래와 같이 나오는 것을 볼 수 있다.
+```aidl
+Hibernate: drop table posts if exists
+Hibernate: create table posts (id bigint generated by default as identity, author varchar(255), content TEXT not null, title varchar(500) not null, primary key (id))
+...
+...
+Hibernate: delete from posts where id=?
+Hibernate: drop table posts if exists
+```
+* 아래한줄을 추가해주면 이쁘게 출력 된다.
+```aidl
+spring.jpa.properties.hibernate.format_sql=true
+```
+* 이런식으로
+```aidl
+    create table posts (
+       id bigint generated by default as identity,
+        author varchar(255),
+        content TEXT not null,
+        title varchar(500) not null,
+        primary key (id)
+    )
+    Hibernate: 
+    insert 
+    into
+        posts
+        (id, author, content, title) 
+    values
+        (null, ?, ?, ?)
+```
+* 그런데 ```create table```쿼리에서  ```id bigint generated by default as identity```라는 옵션으로 생성된다.
+* 이는 H2의 쿼리 문법이 적용 되었기 때문이다.
+* 디버깅을 위해 출력되는 쿼리 로그를 MySQL 버전으로 변경한다.
+```aidl
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+```
+* application.properties에 위 설정을 추가한다.
+* 아래와 같이 출력이 변경된 것을 볼 수 있다.
+```aidl
+    create table posts (
+       id bigint not null auto_increment,
+       ...
+```
+
+---
+## 4. 등록/수정/조회 API만들기
+* API를 만들기 위해 다음과 같은 3개의 클래스가 필요하다.
+> Request 데이터를 받을 ```Dto```, API 요청을 받을 ```Controller```, 트랜잭션, 도메인 기능 간의 순서를 보장하는 ```Service```
+* ```Service```는 트랜잭션, 도메인 간 순서 보장의 역할만 할 뿐, 비지니스 로직을 처리해야한다는 것은 오해이다.
+* 비지니스 로직은 Spring 웹 계층중 ```Domain Model```에서 처리해야한다.
+* 기존의 서비스로 처리하던 방식을 ```트랜잭션 스크립트```라고 한다. 아래와 같이 작성한다.
+```java
+@Transactional
+public Order cancelOrder(int orderId){
+    OrderDto order = ordersDao.selectOrders(orderId);
+    BillingDto billing ...생략...
+    DeliveryDto delivery ...생략...
+        
+    String deliveryStatus = delivery.getSatus();
+    
+    if(deliveryStatus.equals("IN_PROGRESS")){
+        delivery.setStatus(...)
+        deliveryDao.update(delivery)    
+    }
+    
+    order.setStatus(...)
+    orderDao.update(order)
+        
+    billing.setStatus(...)
+    billingDao.update(billing)
+        
+    return order;
+}
+```
+* 위 코드는 모든 로직이 서비스 클래스 내부에서 처리된다.
+* 따라서 ```서비스 계층```이 무의미해진다.
+* 반면 도메인 모델에서 처리할 경우 다음과 같은 코드가 될 수 있다.
+```java
+@Transactional
+public Order cancelOrder(int orderId){
+    Orders order = ordersRepository.findById(orderId);
+    Billing billing = billingRepository.findById(orderId);
+    Delivery delivery = ...
+    
+    delivery.cancel();
+    order.cancel();
+    billing.cancel();
+    
+    return order;
+}
+```
+* ```order```, ```billing```, ```delivery```가 각자 본인의 취소 이벤트 처리를 하며, 서비스 메소드는 트랜잭션과 도메인 간의 순서만 보장한다.
+### 4.1 등록 기능 추가
+* ```PostsApiController```, ```PostSaveRequestDto```, ```PostsService```를 추가 한다.
+```java
+// /web/PostsApiController
+@RequiredArgsConstructor// final이 선언된 모든 필드를 인자값으로 하는 생성자를 만든다
+                        // 이때 Bean을 주입 받는다. 
+@RestController
+public class PostsApiController {
+    private final PostsService postsService;
+
+    @PostMapping("/api/v1/posts")
+    public Long save(@RequestBody PostsSaveRequestDto requestDto){
+        return postsService.save(requestDto);
+    }
+}
+```
+```java
+// /web/dto/PostsSaveRequestDto
+@Getter
+@NoArgsConstructor
+public class PostsSaveRequestDto {
+    private String title;
+    private String content;
+    private String author;
+
+    @Builder
+    public PostsSaveRequestDto(String title, String content, String author){
+        this.author = author;
+        this.content = content;
+        this.title = title;
+    }
+
+    public Posts toEntity(){
+        return Posts.builder()
+                .title(title)
+                .author(author)
+                .content(content)
+                .build();
+    }
+}
+```
+
+```java
+// /service/posts/PostsService
+@RequiredArgsConstructor
+@Service
+public class PostsService {
+    private final PostsRepository postsRepository;
+
+    @Transactional
+    public Long save(PostsSaveRequestDto requestDto){
+        return postsRepository.save(requestDto.toEntity()).getId();
+    }
+}
+```
