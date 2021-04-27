@@ -98,5 +98,8 @@ public class PostsApiControllerTest {
         assertThat(all.get(0).getTitle()).isEqualTo(expectedTitle);
         assertThat(all.get(0).getContent()).isEqualTo(expectedContent);
         assertThat(all.get(0).getAuthor()).isEqualTo("author");
+
+        Posts post = all.get(0);
+        System.out.println(">>>>>>>>> createDate = " + post.getCreateDate() + ", modifiedDate = " + post.getModifiedDate());
     }
 }
