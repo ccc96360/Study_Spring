@@ -45,7 +45,7 @@ Group group = groupDao.findGroup(user.getGroupId());
 * 하지만 Spring에서 JPA를 사용할 때는 이 구현체들을 직접 다루진 않는다.
 * 구현체들을 좀 더 쉽게 사용하고자 추상화 시킨 Spring Data JPA라는 모듈을 이용해 JPA 기술을 다룬다.
 > 관계: JPA <- Hibernate <- Spring Data JPA 
-* 한단계 더 감싸놓은 Spring Data JPA와 Hibernate를 쓰는 것 아이네느 큰 차이가 없지만, 그럼에도 사용 하는 이유는 크게 2가지 이다.
+* 한단계 더 감싸놓은 Spring Data JPA와 Hibernate를 쓰는 것 사이에는 큰 차이가 없지만, 그럼에도 사용 하는 이유는 크게 2가지 이다.
 > #### 구현체 교체의 용이성
 > * ```Hibernate```외에 ```다른 구현체로 쉽게 교체하기 위함```이다.
 > * Spring Data JPA 내부에서 구현체 매핑을 지원해주기 떄문이다.
@@ -63,7 +63,7 @@ Group group = groupDao.findGroup(user.getGroupId());
     compile('com.h2database:h2')
 ```
 * 위와같이 build.gradle에 의존성을 추가한다.
-
+* h2는 인메모리 관계형 디비로, 로컬환경과 테스트 환경에서 사용하기위해 추가한다.
 ### 2.2 domain 패키지 추가
 * domain패키지를 추가한다.
 * 내부에 posts 패키지와 아래와 같이 ```Posts``` 클래스를 생성한다.
@@ -164,7 +164,7 @@ public class PostsRepositoryTest {
     }
 }
 ```
-* 실제로 실행된 쿼리는 어떤 형태인지 보는법 
+### 2.5 실제로 실행된 쿼리는 어떤 형태인지 보는법 
 * /src/main/resources에 application.properties 생성
 ```
 spring.jpa.properties.hibernate.show_sql=true
@@ -216,7 +216,7 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
 ---
 ## 3. 등록/수정/조회 API만들기
 * API를 만들기 위해 다음과 같은 3개의 클래스가 필요하다.
-> Request 데이터를 받을 ```Dto```, API 요청을 받을 ```Controller```, 트랜잭션, 도메인 기능 간의 순서를 보장하는 ```Service```
+> Request 데이터를 받고 Response를 돌려줄 ```Dto```, API 요청을 받을 ```Controller```, 트랜잭션, 도메인 기능 간의 순서를 보장하는 ```Service```
 * ```Service```는 트랜잭션, 도메인 간 순서 보장의 역할만 할 뿐, 비지니스 로직을 처리해야한다는 것은 오해이다.
 * 비지니스 로직은 Spring 웹 계층중 ```Domain Model```에서 처리해야한다.
 * 기존의 서비스로 처리하던 방식을 ```트랜잭션 스크립트```라고 한다. 아래와 같이 작성한다.
