@@ -62,7 +62,7 @@ public class User {
     @Column
     private String picture;
 
-    @Enumerated(EnumType.STRING) //  JPA로 DB에 저장할때 Enum값을 어던 형ㅇ태로 저장할지를 결정한다.
+    @Enumerated(EnumType.STRING) //  JPA로 DB에 저장할때 Enum값을 어떤 형태로 저장할지를 결정한다.
                                 // 디폴트는 int로 된 숫자이다.
                                 // 숫자로 저장되면 그 값이 무슨 코드르 의미하는지 알 수가 없다.
     @Column(nullable = false)
@@ -192,45 +192,45 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 * 다음으로 ```OAuthAttributes``` 클래스를 작성한다.
 * config.auth 패키지 내부에 dto 패키지를 생성해 그 안에 생성한다.
 ```java
-@RequiredArgsConstructor
-@Service
-public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    
-    private final UserRepository userRepository;
-    private final HttpSession httpSession;
-    
-    @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
-        OAuth2User oAuth2User = delegate.loadUser(userRequest);
+@Getter
+public class OAuthAttributes {
+    private Map<String, Object> attributes;
+    private String nameAttributeKey;
+    private String name;
+    private String email;
+    private String picture;
 
-        // 현재 로그인 진행중인 서비스를 구분하느 코드이다.
-        String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        // OAuth2 로그인 진행 시 키가되는 필드 값을 이야기한다. Primary Key와 같은 의미이다.
-        // 구글은 기본적으로 코드를 지원하지만 네이버 카카오 등은 기본 지원하지 않는다.
-        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName(); 
-        // OAuth2UserService를 통해 가져온 OAuth2User의 Attribute를 담는 클래스이다.
-        OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
-
-        User user = saveOrUpdate(attributes);
-         
-        httpSession.setAttribute("user", new SessionUser(user));// SessionUser는 세션에 사용자 정보를 저장하기 위한 DTO이다.
-        
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())),
-                attributes.getAttributes(),
-                attributes.getNameAttributeKey());
+    @Builder
+    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey, String name, String email, String picture) {
+        this.attributes = attributes;
+        this.nameAttributeKey = nameAttributeKey;
+        this.name = name;
+        this.email = email;
+        this.picture = picture;
     }
-    
-    private User saveOrUpdate(OAuthAttributes attributes){
-        User user = userRepository.findByEmail(attributes.getEmail())
-                    .map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
-                    .orElse(attributes.toEntity());
-        return userRepository.save(user);
-        
+    public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes){
+        return ofGoogle(userNameAttributeName, attributes);
+    }
+    private static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
+        return OAuthAttributes.builder()
+                .name((String) attributes.get("name"))
+                .email((String) attributes.get("email"))
+                .picture((String) attributes.get("picture"))
+                .attributes(attributes)
+                .nameAttributeKey(userNameAttributeName)
+                .build();
+    }
+    public User toEntity(){
+        return User.builder()
+                .name(name)
+                .email(email)
+                .picture(picture)
+                .role(Role.GUEST)
+                .build();
     }
 }
 ```
+* ```toEntity()```메서드는 최초 가입시(로그인 시)실행된다. 즉 DB에 일치하는 Email이 없는경우 실행된다. 
 * 마지막으로 세션에 사용자 정보를 저장할 DTO인 ```SessionUser``` 클래스를 생성한다.
 ```java
 @Getter
