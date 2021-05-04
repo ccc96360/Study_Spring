@@ -1,2 +1,10 @@
 com/devminj/web/HelloControllerTest.java
  com.devminj.web.HelloControllerTest
+com/devminj/web/PostsApiControllerTest.java
+ com.devminj.web.PostsApiControllerTest
+com/devminj/web/IndexControllerTest.java
+ com.devminj.web.IndexControllerTest
+com/devminj/domain/posts/PostsRepositoryTest.java
+ com.devminj.domain.posts.PostsRepositoryTest
+com/devminj/web/dto/HelloResponseDtoTest.java
+ com.devminj.web.dto.HelloResponseDtoTest

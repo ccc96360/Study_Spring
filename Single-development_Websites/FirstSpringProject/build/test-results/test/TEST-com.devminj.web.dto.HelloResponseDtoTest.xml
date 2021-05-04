@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.devminj.web.dto.HelloResponseDtoTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-05-04T12:38:43" hostname="DESKTOP-6Q7PPIR" time="0.003">
+  <properties/>
+  <testcase name="롬복_기능_테스트" classname="com.devminj.web.dto.HelloResponseDtoTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

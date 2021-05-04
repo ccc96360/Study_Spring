@@ -30,15 +30,17 @@ repositories {
 dependencies {
     // 버전을 작성하지 않아야 위에서 작성한 버전을 따라가게 된다.
     compile('org.springframework.boot:spring-boot-starter-web')
+    // lombok
     compile('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+    testImplementation('org.projectlombok:lombok')
+    testAnnotationProcessor('org.projectlombok:lombok')
+
     compile('org.springframework.boot:spring-boot-starter-data-jpa:')
     compile('com.h2database:h2')
     compile('org.springframework.boot:spring-boot-starter-mustache')
     compile('org.springframework.boot:spring-boot-starter-oauth2-client')
     compile('org.springframework.session:spring-session-jdbc')
+    testCompile('org.springframework.security:spring-security-test')
     testCompile('org.springframework.boot:spring-boot-starter-test')
-}
-
-test {
-    useJUnitPlatform()
 }
