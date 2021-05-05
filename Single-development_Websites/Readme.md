@@ -7,4 +7,5 @@
 * [JPA로 DB를 다뤄보자](./FirstSpringProject/JPA로_DB를_다뤄보자.md)
 * [머스테치로 화면 구성하기](./FirstSpringProject/머스테치로_화면_구성.md)
 * [소셜 로그인 구현하기](./FirstSpringProject/스프링시큐리티_OAuth2.0으로_로그인_구현하기_기초.md)
-* [소셜 로그인 개선하기 ](./FirstSpringProject/스프링시큐리티_OAuth2.0으로_로그인_구현하기_개선.md)
+* [소셜 로그인 개선하기](./FirstSpringProject/스프링시큐리티_OAuth2.0으로_로그인_구현하기_개선.md)
+* [AWS 환경 세팅하기](./FirstSpringProject/AWS_환경_세팅하기.md)
