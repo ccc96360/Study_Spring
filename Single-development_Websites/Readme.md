@@ -10,3 +10,4 @@
 * [소셜 로그인 개선하기](./FirstSpringProject/스프링시큐리티_OAuth2.0으로_로그인_구현하기_개선.md)
 * [AWS 환경 세팅하기](./FirstSpringProject/AWS_환경_세팅하기.md)
 * [라즈베리 파이 환경 설정](./FirstSpringProject/라즈베리파이_환경설정.md)
+* [라즈베리 파이에 배포 하기](./FirstSpringProject/라즈베리파이에_배포_하기.md)
