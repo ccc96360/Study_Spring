@@ -25,7 +25,7 @@
 
 ### 2.2 프로젝트 설정  
 * Travis CI의 상세한 설정은 프로젝트에 존재하는 ```.travis.yml``` 파일로 할 수 있다.
-* build.gradle과 같은 위치에 다음과 같이 .travis.yml 파일을 생성한다.
+* 깃헙 리포지토리 루트에 다음과 같이 .travis.yml 파일을 생성한다.
 ```yml
 language: java
 
@@ -42,7 +42,7 @@ cache:
     - '$HOME/.m2/repository'
     - '$HOME/.gradle'
 
-script: "./gradlew clean build"
+script: "./Single-development_Websites/FirstSpringProject/gradlew clean build"
 
 # CI 실행 완료 시 메일로 알람
 notifications:
