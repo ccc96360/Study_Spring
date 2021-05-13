@@ -12,7 +12,7 @@ cache:
     - '$HOME/.m2/repository'
     - '$HOME/.gradle'
 
-script: ./build.sh
+script: "./Single-development_Websites/FirstSpringProject/gradlew clean build"
 
 # CI 실행 완료 시 메일로 알람
 notifications:
