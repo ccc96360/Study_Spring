@@ -20,7 +20,7 @@
 ## 2. Travis CI 연동하기
 * Travis CI는 깃허브에서 제공하는 무료 CI 서비스이다.
 ### 2.1 설정
-* [Travis CI 홈페이지](https://travis-ci.org) 로 이동한다.
+* [Travis CI 홈페이지](https://travis-ci.com) 로 이동한다.
 * Github으로 로그인 후 Settings에서 현재 프로젝트가 올라간 리포지토리를 선택한다.
 
 ### 2.2 프로젝트 설정  
@@ -50,3 +50,4 @@ notifications:
     recipients:
       - 이메일 주소
 ```
+ㅁ
