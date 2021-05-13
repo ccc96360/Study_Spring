@@ -6,7 +6,13 @@ branches:
   only:
     - master
 
-script: "./Single-development_Websites/FirstSpringProject/gradlew clean build"
+# Travis CI 서버의 Home
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.gradle'
+
+script: build.sh
 
 # CI 실행 완료 시 메일로 알람
 notifications:
