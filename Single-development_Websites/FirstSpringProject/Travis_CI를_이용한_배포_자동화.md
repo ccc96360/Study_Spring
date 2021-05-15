@@ -106,7 +106,6 @@ deploy:
 
 ## 4. CodeDeploy 연동하기
 * [여기](https://aws.amazon.com/ko/blogs/devops/automating-deployments-to-raspberry-pi-devices-using-aws-codepipeline/) 를 참고 하며 진행했다.
-* CodeDeploy 설치가 우분투 20.04LTS에서 잘 안되는 부분이 있어서 [AWS 깃헙](https://github.com/aws/aws-codedeploy-agent) 를 보고 직접 빌드했다.
 
 ### 4.1 온프레미스 인스턴스 생성
 * 다음과 같이 awscli를 다운받고 설정을 한다.
@@ -130,7 +129,16 @@ aws deploy list-on-premises-instances
 }
 ```
 * 생성된 인스턴스는 웹에서도 확인 가능하다
-* 코드 디플로이 설치는 위의 AWS깃헙에서 직접 빌드한다.
+* 코드디플로이 에이전트는 아래와 같이 다운 받는다.
+```shell
+wget https://aws-codedeploy-ap-northeast-2.s3.ap-northeast-2.amazonaws.com/latest/install
+sudo ./install auto > /tmp/logfile
+```
+* 위와 같이 우분투20.04에서는 설치 중 출력을 따로 빼야 설치가 정상적으로 되는 이상한 현상이 있다.
+* 다음과 같은 명령어로 제대로 설치 되었는지 확인한다.
+```shell
+service codedeploy-agent status
+```
 
 ### 4.2 앱 생성
 * CodeDeploy 서비스를 선택해 IAM 역할을 생성한다. (역할 이름: CodeDeployRoleforRpi4)

@@ -2,5 +2,5 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /root/single-development-webservice/step2/zip
+    destination: /root/single-development-webservice/step2/zip/
     overwrite: yes
