@@ -73,6 +73,66 @@ notifications:
 * 모든 퍼블릭 액세스가 차단된 버킷을 만든다.
 
 ### 3.4 .travis.yml 수정
+* 아래와 같은 코드를 추가한다.
 ```yaml
+before_deploy:
+  - pwd
+  - zip -r single-development-webservice *
+  - mkdir -p deploy
+  - mv single-development-webservice.zip deploy/single-development-webservice.zip
 
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: single-development-webservice
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: private
+    local_dir: deploy
+    wait-unitl-deployed: true
+    on:
+      all_branches: true
 ```
+> beforels_deploy에서 ```pwd```로 찍어본 위치
+> * /home/travis/build/ccc96360/Study_Spring/Single-development_Websites/FirstSpringProject
+
+* 위 코드를 추가 후 푸시하면 S3에 ```single-development-webservice.zip``` 이 추가 된것을 확인 할 수있다.
+* 추가적으로, ```Skipping a deployment with the s3 provider because this branch is not permitted``` 오류가 발생 했을 경우 아래와 같은 옵션을 추가하니 해결 되었다.
+```yaml
+    on:
+      all_branches: true
+```
+
+## 4. CodeDeploy 연동하기
+* [여기](https://aws.amazon.com/ko/blogs/devops/automating-deployments-to-raspberry-pi-devices-using-aws-codepipeline/) 를 참고 하며 진행했다.
+* CodeDeploy 설치가 우분투 20.04LTS에서 잘 안되는 부분이 있어서 [AWS 깃헙](https://github.com/aws/aws-codedeploy-agent) 를 보고 직접 빌드했다.
+
+### 4.1 온프레미스 인스턴스 생성
+* 다음과 같이 awscli를 다운받고 설정을 한다.
+```shell
+apt install awscli
+aws configure
+```
+* configure에 Travis CI에 등록한 IAM Key값들을 입력해 주었다.
+```shell
+aws deploy register --instance-name rpi4UbuntuServer --iam-user-arn arn:aws:iam::<IAM ARN값>:user/Rpi --tags Key=Name,Value=Rpi4 --region ap-northeast-2
+```
+* <IAM ARN값>은 IAM 사용자의 ```사용자 ARN값```에 있다.
+* arn:aws:iam::112345678901:user/~~~~~~~~~이런식으로 있으면  ```112345678901```만 사용했다.
+* 위의 명령어가 정상적으로 실행 되면 다음과 같이 인스턴스가 생성 됐음을 확인 할 수 있다.
+```shell
+aws deploy list-on-premises-instances
+{
+    "instanceNames": [
+        "rpi4UbuntuServer"
+    ]
+}
+```
+* 생성된 인스턴스는 웹에서도 확인 가능하다
+* 코드 디플로이 설치는 위의 AWS깃헙에서 직접 빌드한다.
+
+### 4.2 앱 생성
+* CodeDeploy 서비스를 선택해 IAM 역할을 생성한다. (역할 이름: CodeDeployRoleforRpi4)
+* CodeDeploy에서 애플리케이션을 생성한다. (애플리케이션 이름: single-development-webservice)
+* 생성이 완료되면 배포그룹을 생헝한다. 이때 서비스 역할의 ARN은 방금 만들어준 역할을 입력한다. 
