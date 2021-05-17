@@ -106,7 +106,7 @@ deploy:
 
 ## 4. CodeDeploy 연동하기
 * [여기](https://aws.amazon.com/ko/blogs/devops/automating-deployments-to-raspberry-pi-devices-using-aws-codepipeline/) 를 참고 하며 진행했다.
-
+* [여기2](https://docs.aws.amazon.com/ko_kr/codedeploy/latest/userguide/getting-started-provision-user.html)
 ### 4.1 온프레미스 인스턴스 생성
 * 다음과 같이 awscli를 다운받고 설정을 한다.
 ```shell
@@ -132,9 +132,8 @@ aws deploy list-on-premises-instances
 * 코드디플로이 에이전트는 아래와 같이 다운 받는다.
 ```shell
 wget https://aws-codedeploy-ap-northeast-2.s3.ap-northeast-2.amazonaws.com/latest/install
-sudo ./install auto > /tmp/logfile
+sudo ./install auto 
 ```
-* 위와 같이 우분투20.04에서는 설치 중 출력을 따로 빼야 설치가 정상적으로 되는 이상한 현상이 있다.
 * 다음과 같은 명령어로 제대로 설치 되었는지 확인한다.
 ```shell
 service codedeploy-agent status
