@@ -12,3 +12,4 @@
 * [라즈베리 파이 환경 설정](./FirstSpringProject/라즈베리파이_환경설정.md)
 * [라즈베리 파이에 배포 하기](./FirstSpringProject/라즈베리파이에_배포_하기.md)
 * [Travis CI를 이용한 배포 자동화](./FirstSpringProject/Travis_CI를_이용한_배포_자동화.md)
+* [JenKins를 이용한 배포 자동화](./FirstSpringProject/Jenkins로_CI_CD하기.md)

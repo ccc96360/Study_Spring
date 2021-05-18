@@ -45,3 +45,10 @@ ssh-keygen -t rsa -f <인증키 이릅>
 * Branches to build는 원하는 브랜치를 입력한다.
 * 빌드 유발에서는 GitHub hook trigger for GITScm polling을 체크해 웹훅을 통해 빌드를 시작할 수 있게 한다.
 * 이제 깃헙에 코드를 푸시하면 자동으로 빌드가 되며 빌드 결과물은 ```/var/lib/jenkins/workspace```에 위치한다.
+
+## 3. 라즈베리파이 서버에 배포하기
+* [이 블로그](https://goddaehee.tistory.com/259) 를 참고 했다. 
+### 3.1 Publish Over SSH 플러그인 설정 
+* 1. 젠킨스에서 Jenkins 관리 => 플러그인 관리 에서 ```Publish Over SSH``` 플러그인을 다운 받는다.
+* 2. 다운완료후 Jenkins를 제시작 한다.
+* 3. Jenkins 관리 => 시스템 설정 => Publish Over SSH 항목을 작성한다.
