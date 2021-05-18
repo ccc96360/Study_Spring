@@ -51,4 +51,4 @@ ssh-keygen -t rsa -f <인증키 이릅>
 ### 3.1 Publish Over SSH 플러그인 설정 
 * 1. 젠킨스에서 Jenkins 관리 => 플러그인 관리 에서 ```Publish Over SSH``` 플러그인을 다운 받는다.
 * 2. 다운완료후 Jenkins를 제시작 한다.
-* 3. Jenkins 관리 => 시스템 설정 => Publish Over SSH 항목을 작성한다.
+* 3. Jenkins 관리 => 시스템 설정 => Publish Over SSH 항목을 작성한다.   
