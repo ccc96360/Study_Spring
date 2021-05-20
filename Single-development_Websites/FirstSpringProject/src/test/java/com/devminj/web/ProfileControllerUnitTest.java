@@ -6,7 +6,7 @@ import org.springframework.mock.env.MockEnvironment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PrifleControllerUnitTest {
+public class ProfileControllerUnitTest {
 
     @Test
     public void real_profile이_조회된다(){
