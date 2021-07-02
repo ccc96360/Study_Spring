@@ -2,6 +2,7 @@ package com.devminj.basic;
 
 import com.devminj.basic.discount.DiscountPolicy;
 import com.devminj.basic.discount.FixDiscountPolicy;
+import com.devminj.basic.discount.RateDiscountPolicy;
 import com.devminj.basic.member.MemberRepository;
 import com.devminj.basic.member.MemberService;
 import com.devminj.basic.member.MemberServiceImpl;
@@ -31,6 +32,6 @@ public class AppConfig {
 
     @Bean
     public DiscountPolicy discountPolicy(){
-        return new FixDiscountPolicy();
+        return new RateDiscountPolicy();
     }
 }

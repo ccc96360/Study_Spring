@@ -3,7 +3,6 @@ package com.devminj.basic;
 import com.devminj.basic.member.Grade;
 import com.devminj.basic.member.Member;
 import com.devminj.basic.member.MemberService;
-import com.devminj.basic.member.MemberServiceImpl;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
