@@ -1,7 +1,7 @@
 package com.devminj.helloShop;
 
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.devminj.helloShop.domain.Member;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;

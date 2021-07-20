@@ -1,5 +1,6 @@
 package com.devminj.helloShop;
 
+import com.devminj.helloShop.domain.Member;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +25,14 @@ public class MemberRepositoryTest {
     public void testMember() throws Exception {
         //given
         Member member = new Member();
-        member.setUserName("memberA");
+        member.setName("memberA");
         //when
         Long saveId = memberRepository.save(member);
 
         //then
         Member findMember = memberRepository.find(saveId);
         assertThat(findMember.getId()).isEqualTo(member.getId());
-        assertThat(findMember.getUserName()).isEqualTo(member.getUserName());
+        assertThat(findMember.getName()).isEqualTo(member.getName());
         assertThat(findMember).isEqualTo(member);
     }
 
