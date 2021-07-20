@@ -1,6 +1,7 @@
 package com.devminj.helloShop;
 
 import com.devminj.helloShop.domain.Member;
+import com.devminj.helloShop.repository.MemberRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class MemberRepositoryTest {
         Long saveId = memberRepository.save(member);
 
         //then
-        Member findMember = memberRepository.find(saveId);
+        Member findMember = memberRepository.findOne(saveId);
         assertThat(findMember.getId()).isEqualTo(member.getId());
         assertThat(findMember.getName()).isEqualTo(member.getName());
         assertThat(findMember).isEqualTo(member);
