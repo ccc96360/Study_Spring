@@ -1,6 +1,7 @@
 package com.devminj.helloShop.domain.item;
 
 import com.devminj.helloShop.domain.Category;
+import com.devminj.helloShop.exception.NotEnoughStockException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,7 @@ import java.util.List;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
-@Getter @Setter
+@Getter
 public abstract class Item {
 
     @Id @GeneratedValue
@@ -24,4 +25,17 @@ public abstract class Item {
 
     @ManyToMany(mappedBy = "items")
     private List<Category> categories = new ArrayList<>();
+
+    //== 비즈니스 로직 ==//
+    public void addStock(int quantity){
+        this.stockQuantity += quantity;
+    }
+
+    public void removeStock(int quantity) {
+        int restStock = this.stockQuantity - quantity;
+        if(restStock < 0){
+            throw new NotEnoughStockException("Need More Stock");
+        }
+        this.stockQuantity = restStock;
+    }
 }
