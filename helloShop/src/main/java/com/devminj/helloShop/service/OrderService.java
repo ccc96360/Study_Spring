@@ -8,6 +8,7 @@ import com.devminj.helloShop.domain.item.Item;
 import com.devminj.helloShop.repository.ItemRepository;
 import com.devminj.helloShop.repository.MemberRepository;
 import com.devminj.helloShop.repository.OrderRepository;
+import com.devminj.helloShop.repository.OrderSearch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,7 @@ public class OrderService {
     /**
      * 주문 취소
      * */
+
     @Transactional
     public void cancel(Long orderId){
         //엔티티 조회
@@ -56,9 +58,10 @@ public class OrderService {
         //주문 취소
         order.cancel();
     }
-
     /**
      * 검색
      * */
-//    public List<Order> findOrders(OrderSearch orderSearch){}
+    public List<Order> findOrders(OrderSearch orderSearch){
+        return orderRepository.findAll(orderSearch);
+    }
 }

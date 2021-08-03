@@ -1,5 +1,6 @@
 package com.devminj.helloShop.service;
 
+import com.devminj.helloShop.domain.item.Book;
 import com.devminj.helloShop.domain.item.Item;
 import com.devminj.helloShop.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,14 @@ public class ItemService {
     @Transactional
     public void saveItem(Item item){
         itemRepository.save(item);
+    }
+
+    @Transactional
+    public void updateItem(Long itemId, Book param){
+        Item findItem = itemRepository.findOne(itemId);
+        findItem.setPrice(param.getPrice());
+        findItem.setName(param.getName());
+        findItem.setStockQuantity(param.getStockQuantity());
     }
 
     public List<Item> findItems(){
