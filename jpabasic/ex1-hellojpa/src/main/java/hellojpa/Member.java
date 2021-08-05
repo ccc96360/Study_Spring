@@ -21,8 +21,13 @@ public class Member {
         return team;
     }
 
-    public void setTeam(Team team) {
+    /**
+    * 연관 관계 편의메서드
+    * 실수 방지를 위해 팀 설정시 반대 방향에서도 매핑한다.
+    * */
+    public void chageTeam(Team team) {
         this.team = team;
+        team.getMembers().add(this);
     }
 
     public Long getId() {

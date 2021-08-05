@@ -23,14 +23,22 @@ public class JpaMain {
 
             Member member = new Member();
             member.setName("member1");
-            member.setTeam(team);
+            member.chageTeam(team);
             em.persist(member);
+
+//            em.flush();
+//            em.clear();
 
             // 조회
             Member findMember = em.find(Member.class, member.getId());
 
-            Team findTeam = findMember.getTeam();
-            System.out.println("findTeam = " + findTeam.getName());
+            List<Member> findMembers = findMember.getTeam().getMembers();
+
+            System.out.println("================");
+            for (Member m : findMembers) {
+                System.out.println("m.getName() = " + m.getName());
+            }
+            System.out.println("================");
 
             tx.commit();
         } catch (Exception e){
