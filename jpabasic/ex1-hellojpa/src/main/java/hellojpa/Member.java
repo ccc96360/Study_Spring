@@ -11,24 +11,10 @@ public class Member {
     @Column(name = "USERNAME")
     private String name;
 
-//    @Column(name = "TEAM_ID")
-//    private Long teamId;
-    @ManyToOne
-    @JoinColumn(name = "TEAM_ID")
-    private Team team;
+    @OneToOne
+    @JoinColumn(name = "LOCKER_ID")
+    private Locker locker;
 
-    public Team getTeam() {
-        return team;
-    }
-
-    /**
-    * 연관 관계 편의메서드
-    * 실수 방지를 위해 팀 설정시 반대 방향에서도 매핑한다.
-    * */
-    public void chageTeam(Team team) {
-        this.team = team;
-        team.getMembers().add(this);
-    }
 
     public Long getId() {
         return id;
