@@ -15,14 +15,32 @@ public class JpaMain {
 
         tx.begin();
         try {
+            Member member= new Member();
+            member.setName("member1");
+            member.setHomeAddress(new Address("city1", "Street", "zip"));
 
-            Member member = new Member();
-            member.setName("hello");
-            member.setAddress(new Address("A", "B", "C"));
-            member.setPeriod(new Period());
+            member.getFavoriteFoods().add("치킨");
+            member.getFavoriteFoods().add("피자");
+            member.getFavoriteFoods().add("족발");
+
+            member.getAddressHistory().add(new AddressEntity("old1", "street1", "zip1"));
+            member.getAddressHistory().add(new AddressEntity("old2", "street2", "zip2"));
 
             em.persist(member);
 
+            em.flush();
+            em.clear();
+
+            System.out.println("=================== 조회 ====================");
+            Member findMember = em.find(Member.class, member.getId());
+
+            findMember.setHomeAddress(new Address("new city", "new Street", "new zip"));
+
+            findMember.getFavoriteFoods().remove("족발");
+            findMember.getFavoriteFoods().add("한식");
+
+            findMember.getAddressHistory().remove(new AddressEntity("old1", "street1", "zip1"));
+            findMember.getAddressHistory().add(new AddressEntity("city1", "Street", "zip"));
             tx.commit();
         } catch (Exception e){
             tx.rollback();
