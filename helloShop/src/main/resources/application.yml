@@ -9,9 +9,9 @@ spring:
 
   jpa:
     hibernate:
-#      ddl-auto: create
+      ddl-auto: create
       # 한번 넣어둔 데이터 유지됨
-      ddl-auto: none
+#      ddl-auto: none
     properties:
       hibernate:
   #      show_sql: true
