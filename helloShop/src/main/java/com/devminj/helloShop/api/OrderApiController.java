@@ -9,6 +9,7 @@ import com.devminj.helloShop.repository.OrderSearch;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -45,6 +46,18 @@ public class OrderApiController {
     @GetMapping("/api/v3/orders")
     private List<OrderDto> ordersV3(){
         List<Order> orders = orderRepository.findAllWithItem();
+        return orders.stream()
+                .map(OrderDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/api/v3.1/orders")
+    private List<OrderDto> ordersV3_page(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "100") int limit){
+        // xToOne 인거는 그냥 Fetch Join 으로 가져오면 됨
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
+
         return orders.stream()
                 .map(OrderDto::new)
                 .collect(Collectors.toList());

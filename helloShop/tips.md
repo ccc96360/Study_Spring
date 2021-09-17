@@ -23,3 +23,19 @@
   따라서 필드레벨에서 생성하는 것이 가장 안전하고, 코드도 간결하다.
 
 ## 3. Test에 application.yml이 있으면 우선권을 가진다.
+
+## 4. collection 조회를 Fetch 조인으로 최적화
+- orderItems 같은 컬렉션 (List 등) 을 fetch join 하면 결과의 row가 증가한다.
+- order당 orderItem이 여러개 이기 때문에
+- select 절에 ```distinct``` 를 추가하면 된다.
+- MySQL은 distict시 로우의 모든 값이 같아야 중복 제거가 되지만, JPA에서는 가져온 엔티티의 id가 같으면 중복이라 판단해 제거한다. #
+### 단점 
+- 페이징이 불가능 하다.
+- Fetch Join 하면 메모리에 데이터를 다 퍼올린다음에 페이징 처리한다 따라서 데이터가 많으면 메모리가 터진다
+- 데이터가 부정합하게 조회될 가능성이 있기 때문에 컬렉션 2개이상에서는 사용하면 안된다.
+### 4.1 페이징과 한계 돌파
+- xToOne 관계는 그냥 Fetch Join 쓰면 된다.
+- 컬렉션은 지연 로딩으로 조회한다. (Fetch Join 사용 X)
+- 지연 로딩 성능 최적화를 위해 ```hibernate.default_batch_fetch_size```, ```@BatchSize``` 를 적용한다
+- 이 옵션을 사용하면 컬렉션이나 프록시 객체를 한꺼번에 설정한 size만큼 IN 쿼리로 조회한다.
+- ```hibernate.default_batch_fetch_size``` 는 100 ~ 1000 사이을 선택 해야한다.
