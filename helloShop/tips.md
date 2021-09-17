@@ -39,3 +39,4 @@
 - 지연 로딩 성능 최적화를 위해 ```hibernate.default_batch_fetch_size```, ```@BatchSize``` 를 적용한다
 - 이 옵션을 사용하면 컬렉션이나 프록시 객체를 한꺼번에 설정한 size만큼 IN 쿼리로 조회한다.
 - ```hibernate.default_batch_fetch_size``` 는 100 ~ 1000 사이을 선택 해야한다.
+
