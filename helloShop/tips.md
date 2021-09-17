@@ -40,3 +40,15 @@
 - 이 옵션을 사용하면 컬렉션이나 프록시 객체를 한꺼번에 설정한 size만큼 IN 쿼리로 조회한다.
 - ```hibernate.default_batch_fetch_size``` 는 100 ~ 1000 사이을 선택 해야한다.
 
+## 5. OSIV
+- Open Session In View: 하이버네이트
+- Open EntityManager In View: JPA
+- ```spring.jpa.open-in-view``` : true (디폴트)
+- 위 옵션이 true이면 ```@Transaction``` 이 끝나도 반환을 안한다. response가 반환될 때 까지 유지된다.
+- 따라서 뷰템플릿, 컨트롤러에서도 레이지 로딩이 가능해진다.
+- 하지만 너무 오랜시간동안 DB 커넥션 리소스를 사용한다.
+- 따라서 실시간 트래픽이 중요한 애플리케이션에서는 커넥션이 모자랄 수 있다. => 장애로 이어진다.
+
+#### 5.1 커맨드와 쿼리 분리
+- OSIV를 끈 상태로 복잡성을 관리 하기위해 Command와 Query를 분리한다.
+- 
