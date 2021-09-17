@@ -33,6 +33,19 @@ public class OrderQueryRepository {
         return result;
     }
 
+    public List<OrderFlatDto> findAllByDtoFlat() {
+        return em.createQuery(
+                "select new com.devminj.helloShop.repository.order.query.OrderFlatDto(o.id, m.name, o.orderDate, o.status, d.address, i.name, oi.orderPrice, oi.count)" +
+                        " from Order o" +
+                        " join o.member m" +
+                        " join o.delivery d" +
+                        " join o.orderItems oi" +
+                        " join oi.item i", OrderFlatDto.class)
+                .getResultList();
+    }
+
+
+
     private List<Long> toOrderIds(List<OrderQueryDto> result) {
         List<Long> orderIds = result.stream()
                 .map(o -> o.getOrderId())
@@ -70,4 +83,6 @@ public class OrderQueryRepository {
                 " join o.member m" +
                 " join o.delivery d", OrderQueryDto.class).getResultList();
     }
+
+
 }

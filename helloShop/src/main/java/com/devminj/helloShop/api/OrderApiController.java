@@ -6,6 +6,8 @@ import com.devminj.helloShop.domain.OrderItem;
 import com.devminj.helloShop.domain.OrderStatus;
 import com.devminj.helloShop.repository.OrderRepository;
 import com.devminj.helloShop.repository.OrderSearch;
+import com.devminj.helloShop.repository.order.query.OrderFlatDto;
+import com.devminj.helloShop.repository.order.query.OrderItemQueryDto;
 import com.devminj.helloShop.repository.order.query.OrderQueryDto;
 import com.devminj.helloShop.repository.order.query.OrderQueryRepository;
 import lombok.Getter;
@@ -75,6 +77,26 @@ public class OrderApiController {
     @GetMapping("/api/v5/orders")
     private List<OrderQueryDto> ordersV5(){
         return orderQueryRepository.findAllByDtoOptimization();
+    }
+
+    @GetMapping("/api/v6/orders")
+    private List<OrderQueryDto> ordersV6(){
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDtoFlat();
+        return flats.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                o -> new OrderQueryDto(o.getOrderId(), o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                                Collectors.mapping(o-> new OrderItemQueryDto(o.getOrderId(), o.getItemName(), o.getOrderPrice(), o.getCount()), Collectors.toList())
+                        )
+                )
+                .entrySet().stream()
+                .map(e -> {
+                    OrderQueryDto key = e.getKey();
+                    List<OrderItemQueryDto> value = e.getValue();
+                    return new OrderQueryDto(key.getOrderId(), key.getName(), key.getOrderDate(), key.getOrderStatus(), key.getAddress(), value);
+                })
+                .collect(Collectors.toList());
+
     }
 
     @Getter
