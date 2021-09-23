@@ -79,3 +79,67 @@ select m from Member m where m.userName = :name
 - List 조회에서 조건에 해당하는 Row가 없다면(결과가 없다면) Null이 아닌 빈 컬렉션이 반환된다. 즉 결과 == null => false임.
 - 단건 조회(Member 로 리턴)은 결과가 없다면 null을 리턴해줌. JPA는 getSingleResult로 값을 조회하면 NoResultException이 발생하는 것과 비교된다.
 - 단건 조회에서 결과가 2개 이상이면 Exception 발생
+## 5. 페이징 과 정렬
+### 5.1 순수 JPA
+```java
+em.createQuery("select m from Member m where m.age = :age order by m.userName desc")
+                .setParameter("age", age)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+```
+- 위와 같이 firstResult로 첫번째 row의 offset을 설정, setMaxResults로 한번에 가져올 row갯수를 지정한다.
+- page에 따른 offset계산은 따로 해주어야한다.
+
+### 5.2 Spring Data JPA
+- org.springframework.data.domain.Sort => 정렬 기능
+- org.springframework.data.domain.Pageable => 페이징 기능
+- org.springframework.data.domain.Page => 추가 count쿼리 결과를 포함
+- org.springframework.data.domain.Slice => count쿼리 없이 다임 페이지만 확인가능(내부적으로 limit + 1 조회)
+- Page Index는 1이 아니라 0부터 시작한다. (0 페이지 부터 시작)
+#### 5.2.1 Page, pageable 사용
+```java
+public interface MemberRepository extends JpaRepository<Member, Long> { 
+    ... 생략 ...
+    Page<Member> findByAge(int age, Pageable pageable);
+}
+```
+- 위 와 같이 작성하면 페이징이 된다.
+```java
+PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "userName"));// offset, limit, 정렬 (Order By 쿼리)
+Page<Member> page = memberRepository.findByAge(age, pageRequest);
+```
+- 위 와 같이 PageRequest를 이용해 호출 한다. 
+```java
+List<Member> content = page.getContent();
+long totalElements = page.getTotalElements();
+```
+- 내용은 getContent를 이용해 값을 불러오고, getTotalElements를 이용해 모든 Row의 개수를 가져온다.
+
+#### 5.2.2 Slice 사용
+- Slice는 Page의 부모 클래스
+```java
+Slice<Member> page2 = memberRepository.findByAge(age, pageRequest);
+```
+- getTotalElements 가 없다, 즉 totalCount를 안센다.
+- limit를 1증가시켜 쿼리를 날려 다음 페이지가 존재하는지 확인한다.
+#### 5.2.3 List 사용
+```java
+List<Member> page3 = memberRepository.findLByAge(age, pageRequest);
+```
+- 리스트로 바로 받아온다.
+
+#### 5.2.4 Count 쿼리 분리
+- 여러 테이블을 Join해서 가져올 경우 Count 쿼리는 Join이 필요 없을 수 있다.
+```java
+    @Query(value = "select m from Member m left join m.team t",
+            countQuery = "select count(m.userName) from Member m")
+    Page<Member> findCByAge(int age, Pageable pageable);
+```
+- 위와 같이 Count Query를 따로 작성해 준다.
+
+#### 5.2.5 DTO로 변환
+```java
+Page<MemberDto> map = page.map(member -> new MemberDto(member.getId(), member.getUserName(), ~~~~~));
+```
+- API 반환시 위 처럼 map을 사용해 Entity가 아닌 DTO로 반환해야 한다.

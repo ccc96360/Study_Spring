@@ -1,5 +1,8 @@
 package study.datajpa.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,4 +35,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findAByUserName(String userName);
     Member findBByUserName(String userName);
     Optional<Member> findCByUserName(String userName);
+
+    Page<Member> findPByAge(int age, Pageable pageable);
+    Slice<Member> findSByAge(int age, Pageable pageable);
+    List<Member> findLByAge(int age, Pageable pageable);
+
+    @Query(value = "select m from Member m left join m.team t",
+            countQuery = "select count(m.userName) from Member m")
+    Page<Member> findCByAge(int age, Pageable pageable);
+
+
 }
