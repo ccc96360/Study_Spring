@@ -6,6 +6,7 @@ import study.datajpa.entity.Member;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,5 +52,11 @@ public class MemberJpaRepository {
     public void deleteAll() {
         Query query = em.createQuery("delete from Member");
         query.executeUpdate();
+    }
+
+    public List<Member> findByUserName(String userName){
+        return em.createNamedQuery("Member.findByUserName", Member.class)
+                .setParameter("userName", userName)
+                .getResultList();
     }
 }
