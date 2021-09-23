@@ -68,3 +68,14 @@ select m from Member m where m.userName = :name
     List<Member> findByNames(@Param("names") Collection<String> names);
 ```
 - 위 와 같이 컬렉션도 가능
+## 4. 반환 타입
+- Spring Data JPA는 반환 타입을 유연하게 제공한다.
+```java
+        List<Member> findAByUserName(String userName);
+        Member findBByUserName(String userName);
+        Optional<Member> findCByUserName(String userName);
+```
+- 모두 UserName을 기반으로 Member를 찾는 쿼리이지만, 반환타입에 맞춰서 알아서 결과가 잘 나온다.
+- List 조회에서 조건에 해당하는 Row가 없다면(결과가 없다면) Null이 아닌 빈 컬렉션이 반환된다. 즉 결과 == null => false임.
+- 단건 조회(Member 로 리턴)은 결과가 없다면 null을 리턴해줌. JPA는 getSingleResult로 값을 조회하면 NoResultException이 발생하는 것과 비교된다.
+- 단건 조회에서 결과가 2개 이상이면 Exception 발생
