@@ -52,3 +52,19 @@ public interface 엔티티repository extends JpaRepository~~~{
 @Query("select new 패키지명.DTO(m.id, m.userName, t.name) from Member m join m.team t")
     List<DTO> findDto();
 ```
+
+## 3. 파라미터 바인딩
+- 위치 기반
+```java
+select m from Member m where m.userName = ?0
+```
+- 이름 기반
+```java
+select m from Member m where m.userName = :name
+```
+### 3.1 컬렉션 파라미터 바인딩
+```java
+@Query("select m from Member m where m.userName in :names")
+    List<Member> findByNames(@Param("names") Collection<String> names);
+```
+- 위 와 같이 컬렉션도 가능
