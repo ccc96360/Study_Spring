@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import java.util.List;
 
@@ -38,6 +39,7 @@ class MemberTest {
         em.persist(member3);
         em.persist(member4);
 
+
         //초기화
         em.flush();
         em.clear();
@@ -51,6 +53,13 @@ class MemberTest {
             System.out.println("->member.team = " + member.getTeam());
         }
 
+        em.flush();
+        em.clear();
 
+        List<Team> teams = em.createQuery("select t from Team t", Team.class).getResultList();
+        for (Team team : teams) {
+            System.out.println("team = " + team);
+            System.out.println("->team.members" + team.getMembers());
+        }
     }
 }
